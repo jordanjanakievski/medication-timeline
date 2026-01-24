@@ -1,0 +1,75 @@
+# --- General / OS ---
+.DS_Store
+Thumbs.db
+*.log
+
+.vscode/
+.idea/
+*.swp
+
+# --- Docker ---
+docker-compose.override.yml
+
+# --- Python (Backend) ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+*.so
+
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+venv/
+env/
+ENV/
+backend/venv/
+backend/env/
+
+# --- Django ---
+*.sqlite3
+db.sqlite3
+backend/db.sqlite3
+backend/media/
+backend/staticfiles/
+
+# --- Node / Bun (Frontend) ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Bun specific
+# Note: bun.lockb SHOULD usually be committed, so it is not listed here.
+
+# Build output
+frontend/dist/
+frontend/build/
+
+# Testing
+coverage/
+
+# --- Environment Variables (CRITICAL) ---
+# Never commit these
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+backend/.env
+frontend/.env
