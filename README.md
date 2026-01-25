@@ -59,3 +59,16 @@ This endpoint can be used to view all the patient ids available in the database:
 - Easy to see gaps
 - Table provides a more traditional view
 - Easy to see all medications, especially if data is incomplete in any way that would complicate timeline creation
+
+### Future Improvements
+
+- For this exercise, creating a more robust data model consisting of multiple tables could be beneficial
+  - Patients table
+  - Prescriptions table
+  - Providers table
+
+## AI Assistance
+
+CLI tools were used throughout to speed up development and generate boilerplate code. It helped me quickly test some timeline visualizations based on some samples found online.
+
+Being new to Django, the tools helped me quickly scaffold up the backend and walk me through setting up models, serializers, and views. Theoretically, all of this was very similar to other MVC frameworks like Express.js or Spring Boot of which I have used before, but made iterating and implementing with Django much faster.
