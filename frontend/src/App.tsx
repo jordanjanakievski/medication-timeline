@@ -10,6 +10,7 @@ import {
   ToggleButtonGroup,
   Badge,
   Tooltip,
+  Button,
 } from "@mui/material";
 import ViewTimelineIcon from "@mui/icons-material/ViewTimeline";
 import ViewListIcon from "@mui/icons-material/ViewList";
@@ -21,35 +22,36 @@ import "./App.css";
 
 function App() {
   const [patientId, setPatientId] = useState<string>("patient_1");
+  const [draftPatientId, setDraftPatientId] = useState<string>("patient_1");
   const [medications, setMedications] = useState<Prescription[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"timeline" | "table">("timeline");
 
+  // Check for data issues (missing start_date)
   const hasDataIssues = medications.some((m) => !m.start_date);
 
   useEffect(() => {
-    const loadData = async () => {
-      if (!patientId) {
-        setMedications([]);
-        return;
-      }
+    if (!patientId) {
+      setMedications([]);
+      return;
+    }
 
-      setLoading(true);
-      setError(null);
-      try {
+    setLoading(true);
+    setError(null);
+    try {
+      const loadData = async () => {
         const data = await fetchPrescriptions(patientId);
         setMedications(data);
-      } catch (err) {
-        console.error(err);
-        setError("Failed to fetch prescriptions");
-        setMedications([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
+      };
+      loadData();
+    } catch (err) {
+      console.error(err);
+      setError("Failed to fetch prescriptions");
+      setMedications([]);
+    } finally {
+      setLoading(false);
+    }
   }, [patientId]);
 
   const handleViewChange = (
@@ -61,6 +63,10 @@ function App() {
     }
   };
 
+  const handleSearchClick = () => {
+    setPatientId(draftPatientId);
+  };
+
   return (
     <Container maxWidth="xl" sx={{ py: 4, minWidth: "1200px" }}>
       <Typography variant="h4" component="h1" gutterBottom>
@@ -68,14 +74,34 @@ function App() {
       </Typography>
 
       <Paper sx={{ p: 3, mb: 4 }}>
-        <TextField
-          label="Patient ID"
-          variant="outlined"
-          fullWidth
-          value={patientId}
-          onChange={(e) => setPatientId(e.target.value)}
-          helperText="Try 'patient_1', 'patient_2', or 'patient_3'"
-        />
+        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+          <TextField
+            label="Patient ID"
+            variant="outlined"
+            fullWidth
+            value={draftPatientId}
+            onChange={(e) => setDraftPatientId(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === "Enter") {
+                handleSearchClick();
+              }
+            }}
+          />
+          <Button
+            variant="contained"
+            onClick={handleSearchClick}
+            sx={{ height: "56px" }}
+          >
+            Search
+          </Button>
+        </Box>
+        <Typography
+          variant="caption"
+          display="block"
+          sx={{ mt: 1, ml: 1.5, color: "text.secondary" }}
+        >
+          Type patient ID and click search (e.g., 'patient_1')
+        </Typography>
       </Paper>
 
       <Box sx={{ position: "relative", minHeight: "200px" }}>
