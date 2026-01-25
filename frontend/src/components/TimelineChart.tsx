@@ -25,7 +25,7 @@ const TimelineChart: React.FC<TimelineChartProps> = ({ medications }) => {
     );
   }
 
-  // 1. Group data by medication_name and collect dosages for each group
+  // Group data by medication_name and collect dosages for each group
   const groupedMeds = useMemo(() => {
     const groups: {
       [key: string]: {
@@ -44,23 +44,32 @@ const TimelineChart: React.FC<TimelineChartProps> = ({ medications }) => {
     return groups;
   }, [medications]);
 
-  // 2. Calculate Date Boundaries
+  // Calculate Date Boundaries
   const { minDate, maxDate, totalDays } = useMemo(() => {
-    const allDates = medications.flatMap((m) => {
-      const start = parseISO(m.start_date);
+    const validMedications = medications.filter((m) => m.start_date);
+
+    if (validMedications.length === 0) {
+      const today = new Date();
+      return {
+        minDate: addDays(today, -30),
+        maxDate: addDays(today, 30),
+        totalDays: 60,
+      };
+    }
+
+    const allDates = validMedications.flatMap((m) => {
+      const start = parseISO(m.start_date as string); // Cast to string as we filtered for non-null
       const end = m.end_date ? parseISO(m.end_date) : new Date();
       return [start, end];
     });
 
-    // Add today to the range so the "Today" line is always visible
     allDates.push(new Date());
 
     const earliest = min(allDates);
     const latest = max(allDates);
 
-    // Add buffer
-    const paddedMin = addDays(earliest, -30); // 1 month lookback buffer
-    const paddedMax = addDays(latest, 30); // 1 month lookforward buffer
+    const paddedMin = addDays(earliest, -30);
+    const paddedMax = addDays(latest, 30);
 
     return {
       minDate: paddedMin,
@@ -69,7 +78,6 @@ const TimelineChart: React.FC<TimelineChartProps> = ({ medications }) => {
     };
   }, [medications]);
 
-  // Helper to get % position
   const getPositionPct = (date: Date) => {
     const diff = differenceInDays(date, minDate);
     return (diff / totalDays) * 100;
@@ -119,11 +127,11 @@ const TimelineChart: React.FC<TimelineChartProps> = ({ medications }) => {
         {/* Left Columns: Name + Dosage */}
         <Box
           sx={{
-            minWidth: "320px", // Adjusted width for two columns
+            minWidth: "320px",
             maxWidth: "320px",
             borderRight: "1px solid #e0e0e0",
             bgcolor: "#f9f9f9",
-            display: "flex", // Enable flex for sub-columns
+            display: "flex",
             flexDirection: "column",
           }}
         >
@@ -133,7 +141,7 @@ const TimelineChart: React.FC<TimelineChartProps> = ({ medications }) => {
               height: "40px",
               borderBottom: "1px solid #e0e0e0",
               display: "flex",
-              flexShrink: 0, // Prevent shrinking
+              flexShrink: 0,
             }}
           >
             <Box
@@ -151,7 +159,7 @@ const TimelineChart: React.FC<TimelineChartProps> = ({ medications }) => {
             </Box>
             <Box
               sx={{
-                flexGrow: 1, // Take remaining space
+                flexGrow: 1,
                 display: "flex",
                 alignItems: "center",
                 px: 1,
@@ -172,7 +180,7 @@ const TimelineChart: React.FC<TimelineChartProps> = ({ medications }) => {
                 height: "60px",
                 borderBottom: "1px solid #eee",
                 display: "flex",
-                flexShrink: 0, // Prevent shrinking
+                flexShrink: 0,
                 "&:last-child": { borderBottom: "none" },
               }}
             >
@@ -227,12 +235,11 @@ const TimelineChart: React.FC<TimelineChartProps> = ({ medications }) => {
               borderBottom: "1px solid #e0e0e0",
               position: "relative",
               width: "100%",
-              minWidth: "800px", // Force scroll if needed
+              minWidth: "800px",
             }}
           >
             {/* Render some date markers */}
             {Array.from({ length: 12 }).map((_, i) => {
-              // Distribute 10-12 labels across the range
               const pct = (i / 11) * 100;
               const d = addDays(minDate, totalDays * (i / 11));
               return (
@@ -265,7 +272,7 @@ const TimelineChart: React.FC<TimelineChartProps> = ({ medications }) => {
                 width: "2px",
                 bgcolor: "red",
                 zIndex: 10,
-                pointerEvents: "none", // Let clicks pass through
+                pointerEvents: "none",
               }}
             />
 
@@ -283,13 +290,16 @@ const TimelineChart: React.FC<TimelineChartProps> = ({ medications }) => {
               >
                 {/* Render bars for this medication */}
                 {group.prescriptions.map((med) => {
+                  // Only render if start_date is available for timeline placement
+                  if (!med.start_date) return null;
+
                   const start = parseISO(med.start_date);
                   const end = med.end_date
                     ? parseISO(med.end_date)
-                    : new Date(); // If ongoing, effectively "today" for visualization
+                    : new Date();
 
                   const leftPct = getPositionPct(start);
-                  const widthPct = Math.max(getPositionPct(end) - leftPct, 0.5); // Min width for visibility
+                  const widthPct = Math.max(getPositionPct(end) - leftPct, 0.5);
 
                   return (
                     <Tooltip
@@ -302,6 +312,11 @@ const TimelineChart: React.FC<TimelineChartProps> = ({ medications }) => {
                           <Typography variant="body2">
                             {med.start_date} — {med.end_date || "Ongoing"}
                           </Typography>
+                          {med.prescribing_doctor && (
+                            <Typography variant="body2">
+                              Prescriber: {med.prescribing_doctor}
+                            </Typography>
+                          )}
                           <Typography variant="body2">
                             {med.frequency}
                           </Typography>
@@ -332,7 +347,7 @@ const TimelineChart: React.FC<TimelineChartProps> = ({ medications }) => {
                           whiteSpace: "nowrap",
                           boxShadow: 1,
                           "&:hover": {
-                            bgcolor: "info.dark", // A slightly darker shade for hover
+                            bgcolor: "info.dark",
                           },
                         }}
                       >

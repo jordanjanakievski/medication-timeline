@@ -6,10 +6,17 @@ import {
   Paper,
   Box,
   CircularProgress,
+  ToggleButton,
+  ToggleButtonGroup,
+  Badge,
+  Tooltip,
 } from "@mui/material";
+import ViewTimelineIcon from "@mui/icons-material/ViewTimeline";
+import ViewListIcon from "@mui/icons-material/ViewList";
 import { fetchPrescriptions } from "./api";
 import type { Prescription } from "./api";
 import TimelineChart from "./components/TimelineChart";
+import MedicationTable from "./components/MedicationTable";
 import "./App.css";
 
 function App() {
@@ -17,6 +24,9 @@ function App() {
   const [medications, setMedications] = useState<Prescription[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"timeline" | "table">("timeline");
+
+  const hasDataIssues = medications.some((m) => !m.start_date);
 
   useEffect(() => {
     const loadData = async () => {
@@ -42,8 +52,17 @@ function App() {
     loadData();
   }, [patientId]);
 
+  const handleViewChange = (
+    event: React.MouseEvent<HTMLElement>,
+    newView: "timeline" | "table",
+  ) => {
+    if (newView !== null) {
+      setViewMode(newView);
+    }
+  };
+
   return (
-    <Container maxWidth="xl" sx={{ py: 4, minWidth: '1200px' }}>
+    <Container maxWidth="xl" sx={{ py: 4, minWidth: "1200px" }}>
       <Typography variant="h4" component="h1" gutterBottom>
         Medication Timeline
       </Typography>
@@ -80,7 +99,47 @@ function App() {
           </Typography>
         )}
 
-        <TimelineChart medications={medications} />
+        {/* View Toggle */}
+        {!loading && !error && medications.length > 0 && (
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+            <ToggleButtonGroup
+              value={viewMode}
+              exclusive
+              onChange={handleViewChange}
+              aria-label="view mode"
+            >
+              <ToggleButton value="timeline" aria-label="timeline view">
+                <Tooltip
+                  title={
+                    hasDataIssues
+                      ? "Some records are missing dates and may not appear"
+                      : "Timeline View"
+                  }
+                >
+                  <Badge
+                    color="warning"
+                    variant="dot"
+                    invisible={!hasDataIssues}
+                    sx={{ "& .MuiBadge-badge": { right: -3, top: 3 } }}
+                  >
+                    <ViewTimelineIcon />
+                  </Badge>
+                </Tooltip>
+              </ToggleButton>
+              <ToggleButton value="table" aria-label="table view">
+                <Tooltip title="Table View">
+                  <ViewListIcon />
+                </Tooltip>
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
+        )}
+
+        {viewMode === "timeline" ? (
+          <TimelineChart medications={medications} />
+        ) : (
+          <MedicationTable medications={medications} />
+        )}
       </Box>
     </Container>
   );
