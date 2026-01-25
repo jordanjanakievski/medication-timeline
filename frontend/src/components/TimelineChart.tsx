@@ -15,17 +15,6 @@ interface TimelineChartProps {
 }
 
 const TimelineChart: React.FC<TimelineChartProps> = ({ medications }) => {
-  if (medications.length === 0) {
-    return (
-      <Box sx={{ mt: 4, textAlign: "center" }}>
-        <Typography color="text.secondary">
-          No medications found for this patient.
-        </Typography>
-      </Box>
-    );
-  }
-
-  // Group data by medication_name and collect dosages for each group
   const groupedMeds = useMemo(() => {
     const groups: {
       [key: string]: {
@@ -33,6 +22,11 @@ const TimelineChart: React.FC<TimelineChartProps> = ({ medications }) => {
         dosages: Set<string>;
       };
     } = {};
+
+    if (medications.length === 0) {
+      return {};
+    }
+
     medications.forEach((med) => {
       const key = med.medication_name;
       if (!groups[key]) {
@@ -44,8 +38,7 @@ const TimelineChart: React.FC<TimelineChartProps> = ({ medications }) => {
     return groups;
   }, [medications]);
 
-  // Calculate Date Boundaries
-  const { minDate, maxDate, totalDays } = useMemo(() => {
+  const dateRange = useMemo(() => {
     const validMedications = medications.filter((m) => m.start_date);
 
     if (validMedications.length === 0) {
@@ -78,9 +71,20 @@ const TimelineChart: React.FC<TimelineChartProps> = ({ medications }) => {
     };
   }, [medications]);
 
+  if (Object.keys(groupedMeds).length === 0) {
+    return (
+      <Box sx={{ mt: 4, textAlign: "center" }}>
+        <Typography color="text.secondary">
+          No medications found for this patient (or none with valid start dates
+          for timeline).
+        </Typography>
+      </Box>
+    );
+  }
+
   const getPositionPct = (date: Date) => {
-    const diff = differenceInDays(date, minDate);
-    return (diff / totalDays) * 100;
+    const diff = differenceInDays(date, dateRange.minDate);
+    return (diff / dateRange.totalDays) * 100;
   };
 
   const todayPct = getPositionPct(new Date());
@@ -110,7 +114,9 @@ const TimelineChart: React.FC<TimelineChartProps> = ({ medications }) => {
             <Typography variant="caption">Medication Period</Typography>
           </Box>{" "}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Box sx={{ width: 2, height: 12, bgcolor: "red" }} />
+            <Box
+              sx={{ width: 2, height: 12, bgcolor: "red", borderRadius: "50%" }}
+            />
             <Typography variant="caption">Today</Typography>
           </Box>
         </Box>
@@ -179,8 +185,8 @@ const TimelineChart: React.FC<TimelineChartProps> = ({ medications }) => {
               sx={{
                 height: "60px",
                 borderBottom: "1px solid #eee",
-                display: "flex",
-                flexShrink: 0,
+                position: "relative",
+                width: "100%",
                 "&:last-child": { borderBottom: "none" },
               }}
             >
@@ -241,7 +247,10 @@ const TimelineChart: React.FC<TimelineChartProps> = ({ medications }) => {
             {/* Render some date markers */}
             {Array.from({ length: 12 }).map((_, i) => {
               const pct = (i / 11) * 100;
-              const d = addDays(minDate, totalDays * (i / 11));
+              const d = addDays(
+                dateRange.minDate,
+                dateRange.totalDays * (i / 11),
+              );
               return (
                 <Typography
                   key={i}

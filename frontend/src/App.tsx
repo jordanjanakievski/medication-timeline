@@ -1,17 +1,17 @@
 import { useState, useEffect, useMemo } from 'react';
-import { 
-  Container, 
-  Typography, 
-  TextField, 
-  Paper, 
-  Box, 
+import {
+  Container,
+  Typography,
+  TextField,
+  Paper,
+  Box,
   CircularProgress,
   ToggleButton,
   ToggleButtonGroup,
   Badge,
   Tooltip,
   Button,
-  FormControl, InputLabel, Select, MenuItem // Added for sorting
+  FormControl, InputLabel, Select, MenuItem, type SelectChangeEvent 
 } from '@mui/material';
 import ViewTimelineIcon from '@mui/icons-material/ViewTimeline';
 import ViewListIcon from '@mui/icons-material/ViewList';
@@ -57,15 +57,14 @@ function App() {
   }, [patientId]);
 
   const handleViewChange = (
-    event: React.MouseEvent<HTMLElement>,
+    _event: React.MouseEvent<HTMLElement>,
     newView: 'timeline' | 'table',
   ) => {
     if (newView !== null) {
       setViewMode(newView);
     }
   };
-
-  const handleSortChange = (event: any) => { // Use 'any' for event type from Select for simplicity
+  const handleSortChange = (event: SelectChangeEvent<string>) => {
     setSortBy(event.target.value as 'startDate' | 'alphabetical');
   };
 
@@ -103,8 +102,8 @@ function App() {
                 variant="outlined" 
                 fullWidth
                 value={draftPatientId} 
-                onChange={(e) => setDraftPatientId(e.target.value)} 
-                onKeyPress={(e) => { 
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDraftPatientId(e.target.value)} 
+                onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => { 
                     if (e.key === 'Enter') {
                         handleSearchClick();
                     }
