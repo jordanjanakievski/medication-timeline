@@ -66,6 +66,9 @@ This endpoint can be used to view all the patient ids available in the database:
   - Patients table
   - Prescriptions table
   - Providers table
+- Making the timeline more responsive and mobile-friendly
+  - Attempted a few options, but nothing really worked well and was going to be really usable for a user
+  - Would only really be able to show the table view on mobile similar to many other charting solutions medical professionals would be used to
 
 ## AI Assistance
 
