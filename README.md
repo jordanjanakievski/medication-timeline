@@ -9,7 +9,7 @@
 
 ## Description
 
-This project visualizes a patient's prescription medical history in a timeline format.
+This project visualizes a patient's prescription medical history in a timeline and tableformat.
 
 ## Running Locally
 
@@ -30,6 +30,18 @@ cd medication-timeline
 ```bash
 docker-compose up --build
 ```
+
+## Deployment
+
+**Backend:** Deployed on [Render.com](https://medication-timeline-hklh.onrender.com)
+
+**Frontend:** Deployed on [Vercel](https://medication-timeline-jordan-janakievskis-projects.vercel.app/)
+
+Upon loading the page, it may take a few moments for the backend to spin up if it has been idle.
+
+This endpoint can be used to view all the patient ids available in the database:
+
+[https://medication-timeline-hklh.onrender.com/api/patient/](https://medication-timeline-hklh.onrender.com/api/patient/)
 
 ## Thoughts and Considerations
 

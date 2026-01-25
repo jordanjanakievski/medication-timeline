@@ -165,7 +165,7 @@ const TimelineChart: React.FC<TimelineChartProps> = ({ medications }) => {
             </Box>
             <Box
               sx={{
-                flexGrow: 1,
+                width: "120px",
                 display: "flex",
                 alignItems: "center",
                 px: 1,
@@ -185,8 +185,8 @@ const TimelineChart: React.FC<TimelineChartProps> = ({ medications }) => {
               sx={{
                 height: "60px",
                 borderBottom: "1px solid #eee",
-                position: "relative",
-                width: "100%",
+                display: "flex",
+                flexShrink: 0,
                 "&:last-child": { borderBottom: "none" },
               }}
             >
@@ -210,7 +210,7 @@ const TimelineChart: React.FC<TimelineChartProps> = ({ medications }) => {
               </Box>
               <Box
                 sx={{
-                  flexGrow: 1,
+                  width: "120px",
                   display: "flex",
                   alignItems: "center",
                   px: 1,
