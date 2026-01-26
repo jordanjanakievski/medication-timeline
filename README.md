@@ -35,7 +35,7 @@ docker-compose up --build
 
 **Backend:** Deployed on [Render.com](https://medication-timeline-hklh.onrender.com)
 
-**Frontend:** Deployed on [Vercel](https://medication-timeline-jordan-janakievskis-projects.vercel.app/)
+**Frontend:** Deployed on [Vercel](https://medication-timeline-kappa.vercel.app/)
 
 Upon loading the page, it may take a few moments for the backend to spin up if it has been idle.
 
